@@ -158,6 +158,3 @@ customer-service-env/
     test_api.py      -- FastAPI endpoint integration tests
 ```
 
-## License
-
-MIT
