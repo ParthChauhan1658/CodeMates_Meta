@@ -194,10 +194,6 @@ python upload_to_hf.py
 
 Contributions are welcome! Please feel free to submit issues or pull requests.
 
-## License
-
-MIT
-
 ## Authors
 
 - Parth Chauhan (@ParthChauhan3)
