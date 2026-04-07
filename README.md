@@ -196,7 +196,8 @@ Contributions are welcome! Please feel free to submit issues or pull requests.
 
 ## Authors
 
-- Parth Chauhan (@ParthChauhan3)
+- Parth Chauhan [@ParthChauhan1658](https://github.com/ParthChauhan1658)
+- Bhumi Shetty [@bhumi-28](https://github.com/bhumi-28)
 
 ## Acknowledgments
 
