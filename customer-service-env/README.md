@@ -159,8 +159,11 @@ customer-service-env/
 ```
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 ## License
 
 MIT
 >>>>>>> 9cd60de (stage 2)
+=======
+>>>>>>> c766c1461ec8362e7146cf180e15166dbcbc89b9
