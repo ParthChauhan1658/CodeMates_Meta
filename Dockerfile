@@ -9,10 +9,10 @@ WORKDIR /app
 
 RUN pip install --no-cache-dir --upgrade pip
 
-COPY customer-service-env/requirements.txt .
+COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
-COPY customer-service-env/ .
+COPY . .
 
 RUN chown -R appuser:appuser /app
 USER appuser
