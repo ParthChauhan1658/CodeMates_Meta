@@ -239,10 +239,6 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 
-"""
-FastAPI application for the Customer Service OpenEnv environment.
-
-Provides REST endpoints for reset, step, state, tasks, grader, baseline,
 and health.  Concurrent sessions are managed via a global dict keyed by
 episode ID.
 """
