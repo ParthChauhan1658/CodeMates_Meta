@@ -124,7 +124,7 @@ def run_baseline_local(
             if done:
                 break
 
-    final_reward = max(0.0, min(1.0, total_reward))
+    final_reward = max(0.001, min(0.999, total_reward))
     return {
         "task_id": task_id,
         "score": final_reward,
@@ -213,7 +213,7 @@ def run_baseline_http(
                 if done:
                     break
 
-    final_reward = max(0.0, min(1.0, total_reward))
+    final_reward = max(0.001, min(0.999, total_reward))
     return {
         "task_id": task_id,
         "score": final_reward,
