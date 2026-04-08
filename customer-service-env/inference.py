@@ -321,7 +321,7 @@ async def run_task(
 
     rewards: List[float] = []
     steps_taken = 0
-    score = 0.0
+    score = 0.001
     success = False
 
     log_start(task=task_id, env=BENCHMARK, model=MODEL_NAME)
@@ -452,6 +452,7 @@ async def main() -> None:
 
     # Summary
     avg_score = sum(r["score"] for r in all_results) / len(all_results) if all_results else 0.001
+    avg_score = min(max(avg_score, 0.001), 0.999)
     print(f"\n[DEBUG] Overall average score: {avg_score:.4f}", flush=True)
 
 
