@@ -1,0 +1,23 @@
+name: customer-service-env
+version: "1.0.0"
+description: "A real-world customer service environment where AI agents resolve support queries using multi-step tool-calling."
+tags:
+  - openenv
+  - customer-service
+  - tool-calling
+  - real-world
+tasks:
+  - id: order_status_inquiry
+    name: "Order Status Inquiry"
+    difficulty: easy
+    max_steps: 5
+  - id: return_refund_processing
+    name: "Return & Refund Processing"
+    difficulty: medium
+    max_steps: 10
+  - id: complex_complaint_resolution
+    name: "Complex Complaint Resolution"
+    difficulty: hard
+    max_steps: 15
+author: "Parth"
+hf_space_url: "https://parthchauhan3-customer-service-env.hf.space"
