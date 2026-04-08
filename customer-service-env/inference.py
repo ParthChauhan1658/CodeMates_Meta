@@ -368,7 +368,8 @@ async def run_task(
                         fn_args = {}
 
                     step_data = env_step(http, session_id, fn_name, fn_args)
-                    reward = step_data.get("reward", 0.0)
+                    raw_reward = step_data.get("reward", 0.0)
+                    reward = min(max(raw_reward, 0.001), 0.999)
                     done = step_data.get("done", False)
                     error = step_data.get("info", {}).get("error")
 
