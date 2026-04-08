@@ -34,6 +34,11 @@ def _tool_result(actions: List[Dict[str, Any]], tool_name: str) -> Dict[str, Any
     return {}
 
 
+def _clamp(score: float) -> float:
+    """Clamp score to strictly open interval (0.001, 0.999)."""
+    return max(0.001, min(0.999, score))
+
+
 def _efficiency_score(steps_used: int, max_steps: int, ideal_steps: int) -> float:
     """Score how efficiently the agent used its step budget.
 
@@ -97,7 +102,7 @@ def grade_task1(actions: List[Dict[str, Any]], state: CustomerServiceState) -> D
         + resolution * 0.40
         + efficiency * 0.25
     )
-    score = max(0.0, min(1.0, score))
+    score = _clamp(score)
 
     return {
         "score": round(score, 4),
@@ -156,7 +161,7 @@ def grade_task2(actions: List[Dict[str, Any]], state: CustomerServiceState) -> D
         + correct_outcome * 0.40
         + efficiency * 0.30
     )
-    score = max(0.0, min(1.0, score))
+    score = _clamp(score)
 
     return {
         "score": round(score, 4),
@@ -241,7 +246,7 @@ def grade_task3(actions: List[Dict[str, Any]], state: CustomerServiceState) -> D
         + policy_compliance * 0.25
         + efficiency * 0.20
     )
-    score = max(0.0, min(1.0, score))
+    score = _clamp(score)
 
     return {
         "score": round(score, 4),
@@ -282,7 +287,7 @@ class GraderRegistry:
         if task_id not in _GRADERS:
             return GraderResponse(
                 task_id=task_id,
-                score=0.0,
+                score=0.001,
                 breakdown={},
                 explanation=f"Unknown task_id '{task_id}'.",
             )
@@ -290,7 +295,7 @@ class GraderRegistry:
         if not trajectory:
             return GraderResponse(
                 task_id=task_id,
-                score=0.0,
+                score=0.001,
                 breakdown={},
                 explanation="Empty trajectory -- nothing to grade.",
             )

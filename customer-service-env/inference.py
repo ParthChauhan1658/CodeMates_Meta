@@ -402,7 +402,7 @@ async def run_task(
 
             # Compute final score
             total_reward = sum(rewards)
-            score = min(max(total_reward / MAX_TOTAL_REWARD, 0.0), 1.0)
+            score = min(max(total_reward / MAX_TOTAL_REWARD, 0.001), 0.999)
             success = score >= SUCCESS_SCORE_THRESHOLD
 
         except Exception as exc:
@@ -450,7 +450,7 @@ async def main() -> None:
             stop_docker_container()
 
     # Summary
-    avg_score = sum(r["score"] for r in all_results) / len(all_results) if all_results else 0.0
+    avg_score = sum(r["score"] for r in all_results) / len(all_results) if all_results else 0.001
     print(f"\n[DEBUG] Overall average score: {avg_score:.4f}", flush=True)
 
 
