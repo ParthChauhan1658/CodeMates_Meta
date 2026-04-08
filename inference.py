@@ -87,10 +87,17 @@ def log_end(
     score: float,
     rewards: List[float],
 ) -> None:
+    # Ensure score is strictly between 0 and 1 after rounding
+    rounded_score = round(score, 4)
+    if rounded_score <= 0.0:
+        rounded_score = 0.0001
+    elif rounded_score >= 1.0:
+        rounded_score = 0.9999
+    
     payload = {
         "success": success,
         "steps": steps,
-        "score": round(score, 4),
+        "score": rounded_score,
         "rewards": [round(r, 4) for r in rewards],
     }
     print(f"[END] {json.dumps(payload)}", flush=True)
