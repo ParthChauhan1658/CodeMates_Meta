@@ -6,7 +6,7 @@ colorTo: green
 sdk: docker
 pinned: false
 tags:
-	- openenv
+  - openenv
 ---
 
 # CodeMates Meta - Customer Service AI Agent
