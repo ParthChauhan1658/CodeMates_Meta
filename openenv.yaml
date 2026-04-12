@@ -1,3 +1,6 @@
+spec_version: 1
 name: customer-service-env
-version: "1.0.0"
-description: "A customer service environment where AI agents resolve support queries using multi-step tool-calling."
+type: space
+runtime: fastapi
+app: server.app:app
+port: 7860
