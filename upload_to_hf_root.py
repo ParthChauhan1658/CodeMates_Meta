@@ -17,6 +17,8 @@ files_to_upload = [
     ('customer-service-env/models.py', 'models.py'),
     ('customer-service-env/client.py', 'client.py'),
     ('customer-service-env/baseline.py', 'baseline.py'),
+    ('inference.py', 'inference.py'),
+    ('customer-service-env/inference.py', 'customer-service-env/inference.py'),
     ('customer-service-env/README.md', 'README.md'),
     ('Dockerfile', 'Dockerfile'),
     ('openenv.yaml', 'openenv.yaml'),

@@ -42,14 +42,15 @@ def _clamp(score: float) -> float:
 def _efficiency_score(steps_used: int, max_steps: int, ideal_steps: int) -> float:
     """Score how efficiently the agent used its step budget.
 
-    Returns 1.0 when *steps_used* == *ideal_steps* and degrades linearly
-    toward 0.0 as *steps_used* approaches *max_steps*.
+    Returns a value strictly in (0.001, 0.999) — boundary values are clamped.
     """
     if steps_used <= ideal_steps:
-        return 1.0
-    if steps_used >= max_steps:
-        return 0.0
-    return max(0.0, 1.0 - (steps_used - ideal_steps) / (max_steps - ideal_steps))
+        raw = 1.0
+    elif steps_used >= max_steps:
+        raw = 0.0
+    else:
+        raw = max(0.0, 1.0 - (steps_used - ideal_steps) / (max_steps - ideal_steps))
+    return _clamp(raw)
 
 
 # ---------------------------------------------------------------------------
@@ -107,8 +108,8 @@ def grade_task1(actions: List[Dict[str, Any]], state: CustomerServiceState) -> D
     return {
         "score": round(score, 4),
         "breakdown": {
-            "tool_correctness": round(tool_correctness, 4),
-            "resolution": round(resolution, 4),
+            "tool_correctness": round(_clamp(tool_correctness), 4),
+            "resolution": round(_clamp(resolution), 4),
             "efficiency": round(efficiency, 4),
         },
     }
@@ -166,8 +167,8 @@ def grade_task2(actions: List[Dict[str, Any]], state: CustomerServiceState) -> D
     return {
         "score": round(score, 4),
         "breakdown": {
-            "policy_compliance": round(policy_compliance, 4),
-            "correct_outcome": round(correct_outcome, 4),
+            "policy_compliance": round(_clamp(policy_compliance), 4),
+            "correct_outcome": round(_clamp(correct_outcome), 4),
             "efficiency": round(efficiency, 4),
         },
     }
@@ -251,9 +252,9 @@ def grade_task3(actions: List[Dict[str, Any]], state: CustomerServiceState) -> D
     return {
         "score": round(score, 4),
         "breakdown": {
-            "issue_identification": round(issue_identification, 4),
-            "resolution_quality": round(resolution_quality, 4),
-            "policy_compliance": round(policy_compliance, 4),
+            "issue_identification": round(_clamp(issue_identification), 4),
+            "resolution_quality": round(_clamp(resolution_quality), 4),
+            "policy_compliance": round(_clamp(policy_compliance), 4),
             "efficiency": round(efficiency, 4),
         },
     }
@@ -281,7 +282,7 @@ class GraderRegistry:
     ) -> GraderResponse:
         """Grade a completed episode trajectory.
 
-        Returns a :class:`GraderResponse` with score 0.0 and an error
+        Returns a :class:`GraderResponse` with score 0.001 and an error
         explanation when the trajectory is empty or the task ID is unknown.
         """
         if task_id not in _GRADERS:
