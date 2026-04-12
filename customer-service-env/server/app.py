@@ -135,7 +135,7 @@ class TasksResponse(BaseModel):
 @app.get("/health")
 def health() -> Dict[str, str]:
     """Health check endpoint."""
-    return {"status": "ok"}
+    return {"status": "healthy"}
 
 
 @app.post("/reset", response_model=ResetResponse)
@@ -238,3 +238,5 @@ def main() -> None:
 
 if __name__ == "__main__":
     main()
+
+# openenv spec: health returns healthy
