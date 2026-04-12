@@ -1,6 +1,6 @@
 ---
 title: Customer Service OpenEnv
-emoji: headphone
+emoji: 🎧
 colorFrom: blue
 colorTo: green
 sdk: docker
