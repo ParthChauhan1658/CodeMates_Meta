@@ -150,7 +150,7 @@ class TestGrader:
         resp = client.post("/grader", json={"session_id": sid})
         assert resp.status_code == 200
         data = resp.json()
-        assert data["score"] == 1.0
+        assert data["score"] == 0.999
 
     def test_grader_empty_trajectory(self):
         resp = client.post("/grader", json={
@@ -158,7 +158,7 @@ class TestGrader:
             "trajectory": [],
         })
         assert resp.status_code == 200
-        assert resp.json()["score"] == 0.0
+        assert resp.json()["score"] == 0.001
 
 
 # ---------------------------------------------------------------------------
@@ -203,4 +203,4 @@ class TestFullEpisodeViaAPI:
 
         # Grade it
         resp = client.post("/grader", json={"session_id": sid})
-        assert resp.json()["score"] == 1.0
+        assert resp.json()["score"] == 0.999

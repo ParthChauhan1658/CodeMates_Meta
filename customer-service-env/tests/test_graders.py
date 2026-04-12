@@ -37,7 +37,7 @@ class TestGradeTask1:
         ]
         state = CustomerServiceState(task_id="order_status_inquiry")
         result = grade_task1(actions, state)
-        assert result["score"] == 1.0
+        assert result["score"] == 0.999
         assert result["breakdown"]["tool_correctness"] == 1.0
         assert result["breakdown"]["resolution"] == 1.0
         assert result["breakdown"]["efficiency"] == 1.0
@@ -63,7 +63,7 @@ class TestGradeTask1:
     def test_empty_trajectory_via_registry(self):
         state = CustomerServiceState(task_id="order_status_inquiry")
         resp = GraderRegistry.grade("order_status_inquiry", [], state)
-        assert resp.score == 0.0
+        assert resp.score == 0.001
         assert "empty" in resp.explanation.lower() or "Empty" in resp.explanation
 
 
@@ -103,7 +103,7 @@ class TestGradeTask2:
         ]
         state = CustomerServiceState(task_id="return_refund_processing")
         result = grade_task2(actions, state)
-        assert result["score"] == 1.0
+        assert result["score"] == 0.999
 
     def test_missing_policy_check_lowers_compliance(self):
         actions = [
@@ -145,7 +145,7 @@ class TestGradeTask3:
         ]
         state = CustomerServiceState(task_id="complex_complaint_resolution")
         result = grade_task3(actions, state)
-        assert result["score"] == 1.0
+        assert result["score"] == 0.999
 
     def test_valid_escalation_accepted(self):
         actions = [
@@ -171,7 +171,7 @@ class TestGradeTask3:
     def test_unknown_task_returns_zero(self):
         state = CustomerServiceState(task_id="unknown")
         resp = GraderRegistry.grade("unknown", [{"tool_name": "x"}], state)
-        assert resp.score == 0.0
+        assert resp.score == 0.001
 
 
 # ---------------------------------------------------------------------------
@@ -188,6 +188,6 @@ class TestGraderRegistry:
         ]
         state = CustomerServiceState(task_id="order_status_inquiry")
         resp = GraderRegistry.grade("order_status_inquiry", actions, state)
-        assert resp.score == 1.0
+        assert resp.score == 0.999
         assert resp.task_id == "order_status_inquiry"
         assert "breakdown" in resp.model_dump() or resp.breakdown is not None

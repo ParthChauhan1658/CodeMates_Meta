@@ -286,9 +286,10 @@ class CustomerServiceEnvironment:
             ep.resolution_status = "step_limit_exceeded"
             done = True
 
-        # Clamp cumulative reward at episode end
+        # Clamp cumulative reward at episode end to the open interval (0, 1)
+        # so downstream validators never see boundary scores.
         if ep.done:
-            ep.cumulative_reward = max(0.0, min(1.0, ep.cumulative_reward))
+            ep.cumulative_reward = max(0.001, min(0.999, ep.cumulative_reward))
             reward_signal.cumulative_reward = ep.cumulative_reward
 
         message = (

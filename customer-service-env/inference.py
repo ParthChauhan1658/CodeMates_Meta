@@ -60,8 +60,7 @@ BENCHMARK = "customer-service-env"
 # ---------------------------------------------------------------------------
 
 def log_start(task: str, env: str, model: str) -> None:
-    payload = {"task": task, "env": env, "model": model}
-    print(f"[START] {json.dumps(payload)}", flush=True)
+    print(f"[START] task={task} env={env} model={model}", flush=True)
 
 
 def log_step(
@@ -71,29 +70,26 @@ def log_step(
     done: bool,
     error: Optional[str] = None,
 ) -> None:
-    payload = {
-        "step": step,
-        "action": action,
-        "reward": round(reward, 4),
-        "done": done,
-        "error": error,
-    }
-    print(f"[STEP] {json.dumps(payload)}", flush=True)
+    done_str = "true" if done else "false"
+    error_str = "null" if error is None else error.replace("\n", " ")
+    print(
+        f"[STEP] step={step} action={action} reward={reward:.2f} "
+        f"done={done_str} error={error_str}",
+        flush=True,
+    )
 
 
 def log_end(
     success: bool,
     steps: int,
-    score: float,
     rewards: List[float],
 ) -> None:
-    payload = {
-        "success": success,
-        "steps": steps,
-        "score": round(score, 4),
-        "rewards": [round(r, 4) for r in rewards],
-    }
-    print(f"[END] {json.dumps(payload)}", flush=True)
+    success_str = "true" if success else "false"
+    rewards_str = ",".join(f"{r:.2f}" for r in rewards)
+    print(
+        f"[END] success={success_str} steps={steps} rewards={rewards_str}",
+        flush=True,
+    )
 
 
 # ---------------------------------------------------------------------------
@@ -106,7 +102,6 @@ _container_id: Optional[str] = None
 def start_docker_container(image: str) -> str:
     """Spin up the environment docker container. Returns the base URL."""
     global _container_id
-    print(f"[DEBUG] Starting docker container from image: {image}", flush=True)
 
     result = subprocess.run(
         ["docker", "run", "-d", "-p", f"{ENV_PORT}:{ENV_PORT}", image],
@@ -114,11 +109,9 @@ def start_docker_container(image: str) -> str:
         text=True,
     )
     if result.returncode != 0:
-        print(f"[DEBUG] Docker run failed: {result.stderr}", flush=True)
         sys.exit(1)
 
     _container_id = result.stdout.strip()
-    print(f"[DEBUG] Container started: {_container_id[:12]}", flush=True)
 
     # Wait for server to be ready
     _wait_for_server(ENV_BASE_URL)
@@ -131,7 +124,6 @@ def stop_docker_container() -> None:
     if _container_id:
         subprocess.run(["docker", "stop", _container_id], capture_output=True)
         subprocess.run(["docker", "rm", _container_id], capture_output=True)
-        print(f"[DEBUG] Container stopped: {_container_id[:12]}", flush=True)
         _container_id = None
 
 
@@ -142,12 +134,10 @@ def _wait_for_server(base_url: str, timeout: int = 60) -> None:
         try:
             resp = httpx.get(f"{base_url}/health", timeout=3)
             if resp.status_code == 200:
-                print(f"[DEBUG] Server ready at {base_url}", flush=True)
                 return
         except Exception:
             pass
         time.sleep(2)
-    print(f"[DEBUG] Server did not become ready in {timeout}s", flush=True)
     sys.exit(1)
 
 
@@ -303,8 +293,7 @@ def get_model_response(
             tools=TOOL_DEFINITIONS,
             tool_choice="auto",
         )
-    except Exception as exc:
-        print(f"[DEBUG] Model request failed: {exc}", flush=True)
+    except Exception:
         return None
 
 
@@ -321,7 +310,7 @@ async def run_task(
 
     rewards: List[float] = []
     steps_taken = 0
-    score = 0.001
+    task_score = 0.001
     success = False
 
     log_start(task=task_id, env=BENCHMARK, model=MODEL_NAME)
@@ -368,15 +357,19 @@ async def run_task(
                         fn_args = {}
 
                     step_data = env_step(http, session_id, fn_name, fn_args)
-                    raw_reward = step_data.get("reward", 0.0)
-                    reward = min(max(raw_reward, 0.001), 0.999)
+                    raw_reward = float(step_data.get("reward", 0.0))
+                    reward = raw_reward
                     done = step_data.get("done", False)
+                    tool_result = step_data.get("observation", {}).get("tool_result") or {}
                     error = step_data.get("info", {}).get("error")
+                    if error is None and tool_result.get("status") == "error":
+                        error = tool_result.get("message")
 
                     rewards.append(reward)
                     steps_taken = step
 
-                    action_str = f"{fn_name}({json.dumps(fn_args)})"
+                    compact_args = json.dumps(fn_args, separators=(",", ":"))
+                    action_str = f"{fn_name}({compact_args})"
                     log_step(step=step, action=action_str, reward=reward, done=done, error=error)
 
                     # Add to message history
@@ -403,18 +396,18 @@ async def run_task(
 
             # Compute final score
             total_reward = sum(rewards)
-            score = min(max(total_reward / MAX_TOTAL_REWARD, 0.001), 0.999)
-            success = score >= SUCCESS_SCORE_THRESHOLD
+            task_score = min(max(total_reward / MAX_TOTAL_REWARD, 0.001), 0.999)
+            success = task_score >= SUCCESS_SCORE_THRESHOLD
 
-        except Exception as exc:
-            print(f"[DEBUG] Episode error: {exc}", flush=True)
+        except Exception:
+            pass
 
         finally:
-            log_end(success=success, steps=steps_taken, score=score, rewards=rewards)
+            log_end(success=success, steps=steps_taken, rewards=rewards)
 
     return {
         "task_id": task_id,
-        "score": score,
+        "score": task_score,
         "steps": steps_taken,
         "rewards": rewards,
         "success": success,
@@ -427,8 +420,7 @@ async def run_task(
 
 async def main() -> None:
     if not HF_TOKEN:
-        print("ERROR: HF_TOKEN environment variable is not set.", file=sys.stderr)
-        sys.exit(1)
+        raise ValueError("HF_TOKEN environment variable is required")
 
     # Build OpenAI client using the required variables
     llm_client = OpenAI(base_url=API_BASE_URL, api_key=HF_TOKEN)
@@ -438,7 +430,6 @@ async def main() -> None:
         base_url = start_docker_container(LOCAL_IMAGE_NAME)
     else:
         base_url = HF_SPACE_URL
-        print(f"[DEBUG] Using remote HF Space: {base_url}", flush=True)
 
     all_results = []
     try:
@@ -449,12 +440,6 @@ async def main() -> None:
     finally:
         if LOCAL_IMAGE_NAME:
             stop_docker_container()
-
-    # Summary
-    avg_score = sum(r["score"] for r in all_results) / len(all_results) if all_results else 0.001
-    avg_score = min(max(avg_score, 0.001), 0.999)
-    print(f"\n[DEBUG] Overall average score: {avg_score:.4f}", flush=True)
-
 
 if __name__ == "__main__":
     asyncio.run(main())
