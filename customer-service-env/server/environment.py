@@ -63,14 +63,16 @@ _REWARD_TABLE: Dict[str, Dict[str, float]] = {
     "order_status_inquiry": {
         "lookup_order": 0.30,
         "lookup_customer": 0.30,
-        "send_notification": 0.40,
+        # Keep the best possible task total strictly below 1.0.
+        "send_notification": 0.39,
     },
     "return_refund_processing": {
         "lookup_order": 0.20,
         "lookup_customer": 0.10,
         "check_return_policy": 0.20,
         "initiate_refund": 0.20,
-        "send_notification": 0.30,
+        # Keep the best possible task total strictly below 1.0.
+        "send_notification": 0.29,
     },
     "complex_complaint_resolution": {
         "lookup_order": 0.10,
