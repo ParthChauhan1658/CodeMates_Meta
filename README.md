@@ -1,3 +1,14 @@
+---
+title: Customer Service OpenEnv
+emoji: headphone
+colorFrom: blue
+colorTo: green
+sdk: docker
+pinned: false
+tags:
+	- openenv
+---
+
 # CodeMates Meta - Customer Service AI Agent
 
 An AI-powered customer service environment for evaluating and benchmarking LLM agents on real-world support scenarios. Built for the Meta CodeMates hackathon using the OpenEnv specification.
