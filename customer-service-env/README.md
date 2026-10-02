@@ -1,13 +1,4 @@
----
-title: Customer Service OpenEnv
-emoji: 🎧
-colorFrom: blue
-colorTo: green
-sdk: docker
-pinned: false
-tags:
-  - openenv
----
+
 
 # Customer Service OpenEnv
 
